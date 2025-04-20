@@ -1,0 +1,34 @@
+Parallel final project
+
+
+Available Expressions, Reaching Definitions, Constant-Propagation Analysis, Liveness Analysis - many make use of same general data flow algorithm 
+for ex: register allocation - we need to know which variables are in use at the same time, which cannot be stored in the same register 
+
+Alain Darte, Alexandre Isoard, Tomofumi Yuki. Liveness Analysis in Explicitly-Parallel Programs. [Research Report] RR-8839, CNRS; Inria; ENS Lyon. 2016, pp.25. ⟨hal-01251579⟩ : how to do liveness analysis on parallel programs
+
+
+
+Sequential dataflow: 
+    - input is a control flow graph and fact (lattice information)
+    - process the worklist until empty:
+        . choose a node from the worklist
+        . find the node's predecessors and combine their flow facts
+        . apply the flow function to the combined input to find the new
+        output
+        . if the output has changed, update the graph and add the node's
+        successors to the worklist
+
+## Sequential general dataflow algorithm: 
+
+    let w = new set with all nodes
+    repeat until w is empty
+        let n = w.pop()
+        old_out = out[n]
+        let in = combine(preds[n])
+        out[n] := flow[n](in)
+        if (!equal old_out out[n]),
+        for all m in succs[n], w.add(m)
+    end
+
+
+We can parallelize this - no overlap when processing nodes - use property that all operations are monotonic - doesn't matter the order we preform operations in liveness analysis
