@@ -32,10 +32,10 @@ public:
             int n = w.front();
             w.pop();
 
-            std::vector<int> old_out = out[n];
-            std::vector<int> in = combine(n, preds[n]);
-            out[n] = flow(n);
-            if (out[n] != old_out)
+            std::vector<std::string> old_out = out[n];
+            std::vector<std::string> in = combine(n, preds[n]);
+            this->out[n] = flow(n);
+            if (this->out[n] != old_out)
             {
                 for (int i = 0; i < succs[n].size(); i++)
                 {
@@ -44,23 +44,24 @@ public:
             }
         }
     }
-    virtual std::vector<int> flow(int n)
+
+    /// computes out[n] using in[n']
+    virtual std::vector<std::string> flow(int n)
     {
         return out[n];
     }
 
-    virtual std::vector<int> combine(int n, std::vector<int> &preds)
+    /// computes in[n] using out[n'] for all predecessors n'
+    virtual std::vector<std::string> combine(int n, std::vector<int> &preds)
     {
         return in[n];
     }
 
 public:
     int N;
-
-private:
     std::vector<std::vector<int>> preds;
     std::vector<std::vector<int>> succs;
 
-    std::vector<std::vector<int>> in;
-    std::vector<std::vector<int>> out;
+    std::vector<std::vector<std::string>> in;
+    std::vector<std::vector<std::string>> out;
 };
