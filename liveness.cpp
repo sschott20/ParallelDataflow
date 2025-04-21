@@ -6,6 +6,7 @@
 #include <set>
 #include <algorithm>
 #include <iterator>
+#include <unordered_map>
 
 class Liveness : public DataFlowHelper
 {
@@ -16,34 +17,88 @@ public:
 
     std::vector<std::string> flow(int n)
     {
-        std::cout << "flowing node " << n << "\n";
         std::vector<std::string> new_out;
-        std::sort(this->in[n].begin(), this->in[n].end());
+        std::vector<std::string> dest;
 
-        std::set_difference(this->in[n].begin(), this->in[n].end(),
+        std::set_difference(this->out[n].begin(), this->out[n].end(),
                             this->def[n].begin(), this->def[n].end(),
-                            std::back_inserter(new_out));
-
-        std::set_union(new_out.begin(), new_out.end(),
+                            std::back_inserter(dest));
+        std::set_union(dest.begin(), dest.end(),
                        this->use[n].begin(), this->use[n].end(),
                        std::back_inserter(new_out));
+
         return new_out;
     }
-    std::vector<std::string> combine(int n, std::vector<int> &preds)
+    std::vector<std::string> combine(int n)
     {
-
         std::vector<std::string> new_in;
-        std::vector<std::string> dest;
+
         for (int i = 0; i < this->succs[n].size(); i++)
         {
-            // loop over all out[n'] for all predecessors n'
+
+            std::vector<std::string> dest;
             std::set_union(new_in.begin(), new_in.end(),
-                           this->out[preds[i]].begin(), this->out[preds[i]].end(),
+                           this->in[this->succs[n][i]].begin(), this->in[this->succs[n][i]].end(),
                            std::back_inserter(dest));
             std::sort(dest.begin(), dest.end());
             new_in = dest;
         }
         return new_in;
+    }
+    void solve()
+    {
+        std::queue<int> w;
+        for (int i = 0; i < N; i++)
+        {
+            w.push(i);
+        }
+
+        while (w.size() > 0)
+        {
+            int n = w.front();
+            w.pop();
+
+            std::vector<std::string> old_in = this->in[n];
+            this->out[n] = combine(n);
+            this->in[n] = flow(n);
+            if (this->in[n] != old_in)
+            {
+                for (int i = 0; i < this->preds[n].size(); i++)
+                {
+                    w.push(this->preds[n][i]);
+                }
+            }
+        }
+        std::unordered_map<std::string, std::set<std::string>> solution;
+        for (int i = 0; i < this->N; i++)
+        {
+            for (int j = 0; j < this->in[i].size(); j++)
+            {
+                for (int k = j; k < this->in[i].size(); k++)
+                {
+                    if (solution.find(this->in[i][j]) == solution.end())
+                    {
+                        solution[this->in[i][j]] = std::set<std::string>(); // Or appropriate initialization
+                    }
+                    if (solution.find(this->in[i][k]) == solution.end())
+                    {
+                        solution[this->in[i][k]] = std::set<std::string>();
+                    }
+                    solution[this->in[i][j]].insert(this->in[i][k]);
+                    solution[this->in[i][k]].insert(this->in[i][j]);
+                }
+            }
+        }
+        // print out unordered map
+        for (const auto &pair : solution)
+        {
+            std::cout << pair.first << ": ";
+            for (const auto &s : pair.second)
+            {
+                std::cout << s << " ";
+            }
+            std::cout << "\n";
+        }
     }
     void read_from_file(const std::string &filename)
     {
@@ -96,14 +151,10 @@ public:
                 this->succs[i].push_back(x);
                 this->preds[x].push_back(i);
             }
-
-            std::sort(this->def[i].begin(), this->def[i].end());
-            std::sort(this->use[i].begin(), this->use[i].end());
-            std::sort(this->succs[i].begin(), this->succs[i].end());
-            std::sort(this->preds[i].begin(), this->preds[i].end());
         }
     }
-    void print()
+
+    void print_debug()
     {
         std::cout << "Liveness: \n";
         for (int i = 0; i < this->N; i++)
@@ -155,8 +206,13 @@ private:
 
 int main(int argc, char **argv)
 {
-    Liveness live = Liveness(9);
-    live.read_from_file("../easyliveness.txt");
+    if (argc != 2)
+    {
+        std::cerr << "Usage: " << argv[0] << " <filename>\n";
+        return 1;
+    }
+
+    Liveness live = Liveness(0);
+    live.read_from_file(argv[1]);
     live.solve();
-    live.print();
 }
