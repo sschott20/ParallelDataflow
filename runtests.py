@@ -15,17 +15,23 @@ def generate_input(n):
         d = []
         u = []
         s = []
-        for i in range(random.randint(1, n)):
+        if random.uniform(0, 1) < 0.5:
             d.append(random.choice(VARIABLES))
-        for i in range(random.randint(1, n)):
+
+        for i in range(random.randint(1, 6)):
             u.append(random.choice(VARIABLES))
-        for i in range(random.randint(1, n)):
-            x = random.randint(1, n)   
+
+        for i in range(random.randint(1, 4)):
+            x = random.randint(1, n)
             if x != i:
                 s.append(random.randint(1, n))
-        nodes.append(f"{len(d)} {' '.join(list(set(d)))}")
-        nodes.append(f"{len(u)} {' '.join(list(set(u)))}")
-        nodes.append(f"{len(s)} {' '.join(map(str, list(set(s))))}")
+        d = sorted(list(set(d)))
+        u = sorted(list(set(u)))
+        s = sorted(list(set(s)))
+
+        nodes.append(f"{len(d)} {' '.join(d)}")
+        nodes.append(f"{len(u)} {' '.join(u)}")
+        nodes.append(f"{len(s)} {' '.join(map(str, s))}")
 
     return "\n".join(nodes) + "\n"
 
