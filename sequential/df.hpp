@@ -1,9 +1,11 @@
+#pragma once
 #include <iostream>
 #include <fstream>
 #include <cmath>
 #include <vector>
 #include <queue>
 #include <set>
+#include <string>
 
 // function which computes out[n] given some n, using in[n]
 typedef std::vector<int> flowfptr(int n);
@@ -13,11 +15,17 @@ typedef std::vector<int>(combinefptr)(int n, std::vector<int> &preds);
 
 class DataFlowHelper
 {
+protected:
+    int N;
+    std::vector<std::vector<int>> preds;
+    std::vector<std::vector<int>> succs;
+
+    std::vector<std::vector<std::string>> in;
+    std::vector<std::vector<std::string>> out;
+
 public:
-    DataFlowHelper(int N)
-    {
-        this->N = N;
-    }
+    DataFlowHelper(int N) : N(N) {}
+    virtual ~DataFlowHelper() {}
 
     virtual void solve()
     {
@@ -56,12 +64,4 @@ public:
     {
         return in[n];
     }
-
-public:
-    int N;
-    std::vector<std::vector<int>> preds;
-    std::vector<std::vector<int>> succs;
-
-    std::vector<std::vector<std::string>> in;
-    std::vector<std::vector<std::string>> out;
 };

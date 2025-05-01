@@ -20,6 +20,10 @@ void print_vector(const std::vector<T> &v)
 
 class Liveness : public DataFlowHelper
 {
+private:
+    std::vector<std::vector<std::string>> use;
+    std::vector<std::vector<std::string>> def;
+
 public:
     Liveness(int N) : DataFlowHelper(N)
     {
@@ -208,10 +212,6 @@ public:
             std::cout << "\n\n";
         }
     }
-
-private:
-    std::vector<std::vector<std::string>> use;
-    std::vector<std::vector<std::string>> def;
 };
 
 int main(int argc, char **argv)
