@@ -21,28 +21,29 @@ public:
 
     virtual void solve()
     {
-        std::queue<int> w;
-        for (int i = 0; i < N; i++)
-        {
-            w.push(i);
-        }
+        std::cout << "DataFlowHelper::solve() called" << std::endl;
+        // std::queue<int> w;
+        // for (int i = 0; i < N; i++)
+        // {
+        //     w.push(i);
+        // }
 
-        while (w.size() > 0)
-        {
-            int n = w.front();
-            w.pop();
+        // while (w.size() > 0)
+        // {
+        //     int n = w.front();
+        //     w.pop();
 
-            std::vector<std::string> old_in = this->in[n];
-            this->out[n] = combine(n);
-            this->in[n] = flow(n);
-            if (this->in[n] != old_in)
-            {
-                for (int i = 0; i < this->preds[n].size(); i++)
-                {
-                    w.push(this->preds[n][i]);
-                }
-            }
-        }
+        //     std::vector<std::string> old_in = this->in[n];
+        //     this->out[n] = combine(n);
+        //     this->in[n] = flow(n);
+        //     if (this->in[n] != old_in)
+        //     {
+        //         for (int i = 0; i < this->preds[n].size(); i++)
+        //         {
+        //             w.push(this->preds[n][i]);
+        //         }
+        //     }
+        // }
     }
 
     /// computes out[n] using in[n']

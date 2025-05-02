@@ -123,14 +123,15 @@ public:
 
         std::string s;
         int x;
-
         for (int i = 0; i < this->N; i++)
         {
+            // std::cout << "Node " << i << "\n";
             this->use.push_back(std::vector<std::string>());
             this->def.push_back(std::vector<std::string>());
             this->succs.push_back(std::vector<int>());
 
             file >> def_size;
+            // std::cout << "Def size: " << def_size << "\n";
             for (int j = 0; j < def_size; j++)
             {
                 file >> s;
@@ -138,6 +139,7 @@ public:
             }
 
             file >> use_size;
+            // std::cout << "Use size: " << use_size << "\n";
             for (int j = 0; j < use_size; j++)
             {
                 file >> s;
@@ -145,10 +147,16 @@ public:
             }
 
             file >> succ_size;
+            // std::cout << "Succ size: " << succ_size << "\n";
             for (int j = 0; j < succ_size; j++)
             {
                 file >> x;
+                // std::cout << "Succ: " << x << "\n";
                 this->succs[i].push_back(x);
+                if (this->preds[x].size() == 0)
+                {
+                    this->preds[x] = std::vector<int>();
+                }
                 this->preds[x].push_back(i);
             }
         }

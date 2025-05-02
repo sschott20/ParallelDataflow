@@ -15,8 +15,8 @@ def generate_input(n):
         d = []
         u = []
         s = []
-        if random.uniform(0, 1) < 0.5:
-            d.append(random.choice(VARIABLES))
+        
+        d.append(random.choice(VARIABLES))
 
         for i in range(random.randint(1, 6)):
             u.append(random.choice(VARIABLES))
@@ -24,7 +24,7 @@ def generate_input(n):
         for i in range(random.randint(1, 4)):
             x = random.randint(1, n)
             if x != i:
-                s.append(random.randint(1, n))
+                s.append(random.randint(1, n - 1))
         d = sorted(list(set(d)))
         u = sorted(list(set(u)))
         s = sorted(list(set(s)))
