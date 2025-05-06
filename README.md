@@ -131,6 +131,29 @@ n: n
 
 This shows that 'i' and 'j' interfere with each other (both live in the loop) while 'n' is separate (only used in initialization).
 
+## Test Generation
+
+The repository includes a Python script `generate_tests.py` that can generate various types of test cases for benchmarking and testing purposes. The script supports three types of test cases:
+
+1. **Linear Chain** (`linear`): Generates a linear sequence of nodes where each node defines a variable and uses the previous node's variable.
+
+   ```bash
+   python generate_tests.py linear <size>
+   ```
+
+2. **Binary Tree** (`binary`): Generates a complete binary tree where each node defines a variable and uses its parent's variable.
+
+   ```bash
+   python generate_tests.py binary <size>
+   ```
+
+3. **Mesh** (`mesh`): Generates an n×n mesh where each node connects to its right and down neighbors.
+   ```bash
+   python generate_tests.py mesh <size>
+   ```
+
+The generated test cases follow the same input format as described above and can be used to test the liveness checker's performance on different graph structures and sizes.
+
 ## Building and Running
 
 To compile and run the liveness checker:
