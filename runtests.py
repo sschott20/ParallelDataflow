@@ -5,20 +5,20 @@ import random
 import re
 import os
 
-VARIABLES = [i for i in "abcd"]
+VARIABLES = [i for i in "abcdefghijkl"]
 
 
-def generate_input_morevar(n):
+def generate_input_morevar(n, k):
     nodes = [f"{n}"]
     for i in range(n):
         d = []
         u = []
         s = []
 
-        d.append(random.choice(VARIABLES) + str(int(i / 100)))
+        d.append(random.choice(VARIABLES) + str(int(i / k)))
 
         for j in range(random.randint(1, 3)):
-            u.append(random.choice(VARIABLES) + str(int(i / 100)))
+            u.append(random.choice(VARIABLES) + str(int(i / k)))
 
         for j in range(random.randint(1, 2)):
             x = int(random.normalvariate(i, 5))
@@ -77,30 +77,31 @@ TEST_CASES += [
         "timeout": 30,
     },
     {
-        "name": "Generated test: 10^3 nodes",
-        "input": generate_input_morevar(10**3),
+        "name": "Generated test: 10^3 nodes, k = 10",
+        "input": generate_input_morevar(10**3, 10),
         "timeout": 30,
     },
     {
-        "name": "Generated test: 10^4 nodes",
-        "input": generate_input_morevar(10**4),
+        "name": "Generated test: 10^4 nodes, k = 100",
+        "input": generate_input_morevar(10**4, 100),
         "timeout": 60,
     },
     {
-        "name": "Generated test: 10^5 nodes",
-        "input": generate_input_morevar(10**5),
+        "name": "Generated test: 10^5 nodes, k = 100",
+        "input": generate_input_morevar(10**5, 100),
         "timeout": 120,
     },
     {
-        "name": "Generated test: 10^6 nodes",
-        "input": generate_input_morevar(10**6),
+        "name": "Generated test: 10^6 nodes, k = 100",
+        "input": generate_input_morevar(10**6, 100),
         "timeout": 120,
     },
     {
-        "name": "Generated test (old gen): 10^6 nodes",
-        "input": generate_input(10**6),
+        "name": "Generated test: 10^6 nodes, k = 1000",
+        "input": generate_input_morevar(10**6, 1000),
         "timeout": 120,
     },
+
 ]
 
 
@@ -118,7 +119,7 @@ def compile_cpp_source():
         "-O3",
         "-std=c++17",
         "-pthread",
-        "-I./parlaylib",
+        "-fopenmp",
         "-o",
         "liveness",
         "liveness.cpp",
@@ -193,11 +194,11 @@ def run_tests():
 
         actual_lines = run_parallel_program(test)
         print("Parallel time: ", time.time() - start)
-        start = time.time()
+        start2 = time.time()
         expected_lines = compute_expected_output(test)
-        print("Seq time: ", time.time() - start)
+        print("Seq time: ", time.time() - start2)
 
-        duration = time.time() - start
+        duration = time.time() - start 
         if actual_lines == ["[TIMEOUT]"]:
             print("[FAIL] Program timed out.")
             all_passed = False
@@ -216,7 +217,7 @@ def run_tests():
             )
             all_passed = False
         else:
-            for i in range(len(actual_lines)):
+            for i in range(len(expected_lines)):
                 if actual_lines[i] != expected_lines[i]:
                     print(f"[FAIL] Line {i + 1} does not match.")
                     all_passed = False

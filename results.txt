@@ -1,0 +1,35 @@
+=== Running Test 1: Test 1: Simple 3 node cfg ===
+Parallel time:  0.045342445373535156
+Seq time:  0.003977060317993164
+[Info] Test finished in 0.05s
+
+=== Running Test 2: Small Generated test 2: 4 nodes ===
+Parallel time:  0.015519142150878906
+Seq time:  0.003223896026611328
+[Info] Test finished in 0.02s
+
+=== Running Test 3: Generated test: 10^3 nodes, k = 10 ===
+Parallel time:  0.28262805938720703
+Seq time:  0.1785275936126709
+[Info] Test finished in 0.46s
+
+=== Running Test 4: Generated test: 10^4 nodes, k = 100 ===
+Parallel time:  0.21445655822753906
+Seq time:  0.22353363037109375
+[Info] Test finished in 0.44s
+
+=== Running Test 5: Generated test: 10^5 nodes, k = 100 ===
+Parallel time:  2.4128098487854004
+Seq time:  2.6026220321655273
+[Info] Test finished in 5.02s
+
+=== Running Test 6: Generated test: 10^6 nodes, k = 100 ===
+Parallel time:  23.41976261138916
+Seq time:  30.22650694847107
+[Info] Test finished in 53.65s
+
+=== Running Test 7: Generated test: 10^6 nodes, k = 1000 ===
+Parallel time:  14.871882200241089
+Seq time:  20.189003944396973
+[Info] Test finished in 35.06s
+
