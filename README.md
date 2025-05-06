@@ -2,6 +2,8 @@
 
 A C++ implementation of a liveness analysis tool that determines which variables are live at each program point in a control flow graph. The tool reads a control flow graph description and outputs which variables interfere with each other (are live simultaneously).
 
+The full report can be seen here.
+
 ## Input Format
 
 The input file describes a control flow graph where each node contains:
@@ -156,11 +158,24 @@ The generated test cases follow the same input format as described above and can
 
 ## Building and Running
 
+To test the parallel liveness algorithm against the sequential version over automatically generated test cases use
+
+```bash
+python runtests.py
+```
+
+To compile and run the parallel liveness program:
+
+```bash
+g++ -std=c++11 liveness.cpp -fopenmp -o liveness
+./liveness_checker <test_file>
+```
+
 To compile and run the liveness checker:
 
 ```bash
-g++ -std=c++11 sequential/checker.cpp -o liveness_checker
-./liveness_checker <test_file>
+g++ -std=c++11 sequential/checker.cpp -o checker
+./checker <test_file>
 ```
 
 ## Output Format
