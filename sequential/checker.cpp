@@ -214,15 +214,15 @@ public:
     }
 };
 
-int main(int argc, char **argv)
-{
-    if (argc != 2)
-    {
-        std::cerr << "Usage: " << argv[0] << " <filename>\n";
-        return 1;
-    }
+// int main(int argc, char **argv)
+// {
+//     if (argc != 2)
+//     {
+//         std::cerr << "Usage: " << argv[0] << " <filename>\n";
+//         return 1;
+//     }
 
-    Liveness live = Liveness(0);
-    live.read_from_file(argv[1]);
-    live.solve();
-}
+//     Liveness live = Liveness(0);
+//     live.read_from_file(argv[1]);
+//     live.solve();
+// }
