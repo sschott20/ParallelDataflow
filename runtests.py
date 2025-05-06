@@ -5,26 +5,25 @@ import random
 import re
 import os
 
-VARIABLES = [i for i in "abcdefghijklmnopqrstuvwxyz"]
+VARIABLES = [i for i in "abcd"]
 
 
-def generate_input(n):
-
+def generate_input_morevar(n):
     nodes = [f"{n}"]
     for i in range(n):
         d = []
         u = []
         s = []
-        
-        d.append(random.choice(VARIABLES))
 
-        for i in range(random.randint(1, 6)):
-            u.append(random.choice(VARIABLES))
+        d.append(random.choice(VARIABLES) + str(int(i / 100)))
 
-        for i in range(random.randint(1, 4)):
-            x = random.randint(1, n)
-            if x != i:
-                s.append(random.randint(1, n - 1))
+        for j in range(random.randint(1, 3)):
+            u.append(random.choice(VARIABLES) + str(int(i / 100)))
+
+        for j in range(random.randint(1, 2)):
+            x = int(random.normalvariate(i, 5))
+            if x != i and x > 0 and x < n - 1:
+                s.append(x)
         d = sorted(list(set(d)))
         u = sorted(list(set(u)))
         s = sorted(list(set(s)))
@@ -32,6 +31,33 @@ def generate_input(n):
         nodes.append(f"{len(d)} {' '.join(d)}")
         nodes.append(f"{len(u)} {' '.join(u)}")
         nodes.append(f"{len(s)} {' '.join(map(str, s))}")
+
+    return "\n".join(nodes) + "\n"
+
+
+def generate_input(n):
+    nodes = [f"{n}"]
+    for i in range(n):
+        define = []
+        use = []
+        jump = []
+
+        define.append(random.choice(VARIABLES))
+
+        for i in range(random.randint(1, 6)):
+            use.append(random.choice(VARIABLES))
+
+        for i in range(random.randint(1, 4)):
+            x = random.randint(1, n)
+            if x != i:
+                jump.append(random.randint(1, n - 1))
+        define = sorted(list(set(define)))
+        use = sorted(list(set(use)))
+        jump = sorted(list(set(jump)))
+
+        nodes.append(f"{len(define)} {' '.join(define)}")
+        nodes.append(f"{len(use)} {' '.join(use)}")
+        nodes.append(f"{len(jump)} {' '.join(map(str, jump))}")
 
     return "\n".join(nodes) + "\n"
 
@@ -51,21 +77,30 @@ TEST_CASES += [
         "timeout": 30,
     },
     {
-        "name": "Large Test 3: 10^3 data, 10^3 queries",
-        "input": generate_input(10**3),
+        "name": "Generated test: 10^3 nodes",
+        "input": generate_input_morevar(10**3),
         "timeout": 30,
     },
-    # {
-    #     "name": "Large Test 4: 10^4 data, 10^4 queries",
-    #     "input": generate_input(10**4),
-    #     "timeout": 60,
-    # },
-    # {
-    #     "name": "Large Test 5: 10^5 data, 10^5 queries",
-    #     # data: 10^5 points
-    #     "input": generate_input(10**5),
-    #     "timeout": 120,
-    # },
+    {
+        "name": "Generated test: 10^4 nodes",
+        "input": generate_input_morevar(10**4),
+        "timeout": 60,
+    },
+    {
+        "name": "Generated test: 10^5 nodes",
+        "input": generate_input_morevar(10**5),
+        "timeout": 120,
+    },
+    {
+        "name": "Generated test: 10^6 nodes",
+        "input": generate_input_morevar(10**6),
+        "timeout": 120,
+    },
+    {
+        "name": "Generated test (old gen): 10^6 nodes",
+        "input": generate_input(10**6),
+        "timeout": 120,
+    },
 ]
 
 
@@ -80,7 +115,7 @@ def compile_cpp_source():
 
     compile_cmd = [
         "g++",
-        "-O2",
+        "-O3",
         "-std=c++17",
         "-pthread",
         "-I./parlaylib",
@@ -157,7 +192,10 @@ def run_tests():
         start = time.time()
 
         actual_lines = run_parallel_program(test)
+        print("Parallel time: ", time.time() - start)
+        start = time.time()
         expected_lines = compute_expected_output(test)
+        print("Seq time: ", time.time() - start)
 
         duration = time.time() - start
         if actual_lines == ["[TIMEOUT]"]:
@@ -167,30 +205,22 @@ def run_tests():
         # sort actual lines and expected lines
         actual_lines.sort()
         expected_lines.sort()
-        print(actual_lines)
-        print(expected_lines)
+
+        # print(actual_lines)
+        # print(expected_lines)
+
         # Compare line counts
         if len(actual_lines) != len(expected_lines):
             print(
                 f"[FAIL] Expected {len(expected_lines)} lines, got {len(actual_lines)}."
             )
             all_passed = False
-        # else:
-        #     # Compare lines
-        #     test_failed = False
-        #     for idx, (exp, act) in enumerate(
-        #         zip(expected_lines, actual_lines), start=1
-        #     ):
-        #         errors = compare_lines(exp, act)
-        #         if errors:
-        #             print(f"[FAIL] Mismatch on line {idx}:")
-        #             for err in errors:
-        #                 print("   ", err)
-        #             test_failed = True
-        #     if not test_failed:
-        #         print("[PASS] All lines match.")
-
-        #     all_passed = all_passed and (not test_failed)
+        else:
+            for i in range(len(actual_lines)):
+                if actual_lines[i] != expected_lines[i]:
+                    print(f"[FAIL] Line {i + 1} does not match.")
+                    all_passed = False
+                    break
 
         print(f"[Info] Test finished in {duration:.2f}s")
 

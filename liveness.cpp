@@ -8,6 +8,21 @@
 #include <iterator>
 #include <unordered_map>
 
+// #include <parlay/parallel.h>
+// #include <parlay/primitives.h>
+// #include <parlay/sequence.h>
+// #include <parlay/slice.h>
+
+template <typename T>
+void print_vector(const std::vector<T> &v)
+{
+    for (const auto &s : v)
+    {
+        std::cout << s << " ";
+    }
+    std::cout << "\n";
+}
+
 class Liveness : public DataFlowHelper
 {
 public:
@@ -47,29 +62,46 @@ public:
     }
     void solve()
     {
-        std::queue<int> w;
-        for (int i = 0; i < N; i++)
+        std::vector<int> w;
+        std::vector<int> w2;
+
+        for (int i = 0; i < this->N; i++)
         {
-            w.push(i);
+            w.push_back(i);
         }
 
         while (w.size() > 0)
         {
-            int n = w.front();
-            w.pop();
-
-            std::vector<std::string> old_in = this->in[n];
-            this->out[n] = combine(n);
-            this->in[n] = flow(n);
-            if (this->in[n] != old_in)
+            auto size = w.size();
+            // std::cout << "Size: " << size << "\n";
+#pragma omp parallel for
+            for (int i = 0; i < size; i++)
             {
-                for (int i = 0; i < this->preds[n].size(); i++)
+                // std::cout << "i: " << i << "\n";
+                auto n = w[i];
+
+                std::vector<std::string> old_in = this->in[n];
+                this->out[n] = combine(n);
+                this->in[n] = flow(n);
+                if (this->in[n] != old_in)
                 {
-                    w.push(this->preds[n][i]);
+
+                    for (int i = 0; i < this->preds[n].size(); i++)
+                    {
+                        // data race doesn't matter because we don't care about order?
+                        w2.push_back(this->preds[n][i]);
+                    }
                 }
             }
+
+            w.clear();
+            std::swap(w, w2);
         }
+
+        // gather the results and print them out
+
         std::unordered_map<std::string, std::set<std::string>> solution;
+        // #pragma omp parallel for
         for (int i = 0; i < this->N; i++)
         {
             for (int j = 0; j < this->in[i].size(); j++)
