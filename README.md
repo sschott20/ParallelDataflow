@@ -187,3 +187,13 @@ The liveness checker uses a worklist algorithm to propagate liveness information
 2. Propagates this information through the control flow graph
 3. Identifies which variables are live simultaneously
 4. Outputs the interference relationships between variables
+
+The sequential implementation uses a standard worklist algorithm where:
+
+- A queue maintains nodes that need to be processed
+- For each node, it computes the OUT set by combining IN sets of successors
+- Then computes the IN set using the OUT set and the node's USE/DEF sets
+- If the IN set changes, predecessors are added to the worklist
+- This continues until no more changes occur
+
+The parallel implementation uses a graph coloring approach to identify interfering variables, which can be more efficient for large control flow graphs.
