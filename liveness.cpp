@@ -7,11 +7,7 @@
 #include <algorithm>
 #include <iterator>
 #include <unordered_map>
-
-// #include <parlay/parallel.h>
-// #include <parlay/primitives.h>
-// #include <parlay/sequence.h>
-// #include <parlay/slice.h>
+#include <omp.h>
 
 template <typename T>
 void print_vector(const std::vector<T> &v)
@@ -32,8 +28,8 @@ public:
 
     std::vector<std::string> flow(int n)
     {
-        std::vector<std::string> new_out;
-        std::vector<std::string> dest;
+        std::vector<std::string> new_out = {};
+        std::vector<std::string> dest = {};
 
         std::set_difference(this->out[n].begin(), this->out[n].end(),
                             this->def[n].begin(), this->def[n].end(),
@@ -58,6 +54,7 @@ public:
             std::sort(dest.begin(), dest.end());
             new_in = dest;
         }
+
         return new_in;
     }
     void solve()
@@ -72,27 +69,36 @@ public:
 
         while (w.size() > 0)
         {
+            std::vector<std::vector<int>> local_w2(omp_get_max_threads());
+
             auto size = w.size();
             // std::cout << "Size: " << size << "\n";
 #pragma omp parallel for
             for (int i = 0; i < size; i++)
             {
-                // std::cout << "i: " << i << "\n";
                 auto n = w[i];
-
                 std::vector<std::string> old_in = this->in[n];
                 this->out[n] = combine(n);
                 this->in[n] = flow(n);
                 if (this->in[n] != old_in)
                 {
 
-                    for (int i = 0; i < this->preds[n].size(); i++)
+                    for (int j = 0; j < this->preds[n].size(); j++)
                     {
                         // data race doesn't matter because we don't care about order?
-                        w2.push_back(this->preds[n][i]);
+                        // w2.push_back(this->preds[n][j]);
+                        local_w2[omp_get_thread_num()].push_back(this->preds[n][j]);
                     }
                 }
             }
+            w2.clear();
+            for (const auto &local_w : local_w2)
+            {
+                w2.insert(w2.end(), local_w.begin(), local_w.end());
+            }
+
+            std::sort(w2.begin(), w2.end());
+            w2.erase(std::unique(w2.begin(), w2.end()), w2.end());
 
             w.clear();
             std::swap(w, w2);
@@ -101,7 +107,6 @@ public:
         // gather the results and print them out
 
         std::unordered_map<std::string, std::set<std::string>> solution;
-        // #pragma omp parallel for
         for (int i = 0; i < this->N; i++)
         {
             for (int j = 0; j < this->in[i].size(); j++)

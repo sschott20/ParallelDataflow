@@ -61,16 +61,16 @@ public:
     }
     void solve()
     {
-        std::queue<int> w;
+        std::set<int> w;
         for (int i = 0; i < N; i++)
         {
-            w.push(i);
+            w.insert(i);
         }
 
         while (w.size() > 0)
         {
-            int n = w.front();
-            w.pop();
+            int n = *(w.begin());
+            w.erase(n);
 
             std::vector<std::string> old_in = this->in[n];
             this->out[n] = combine(n);
@@ -79,7 +79,7 @@ public:
             {
                 for (int i = 0; i < this->preds[n].size(); i++)
                 {
-                    w.push(this->preds[n][i]);
+                    w.insert(this->preds[n][i]);
                 }
             }
         }
@@ -214,15 +214,15 @@ public:
     }
 };
 
-// int main(int argc, char **argv)
-// {
-//     if (argc != 2)
-//     {
-//         std::cerr << "Usage: " << argv[0] << " <filename>\n";
-//         return 1;
-//     }
+int main(int argc, char **argv)
+{
+    if (argc != 2)
+    {
+        std::cerr << "Usage: " << argv[0] << " <filename>\n";
+        return 1;
+    }
 
-//     Liveness live = Liveness(0);
-//     live.read_from_file(argv[1]);
-//     live.solve();
-// }
+    Liveness live = Liveness(0);
+    live.read_from_file(argv[1]);
+    live.solve();
+}
